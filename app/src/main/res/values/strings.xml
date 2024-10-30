@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">FinalProject</string>
+    <string name="home_title">Pet App Home</string>
+    <string name="profile_title">Profile</string>
+    <string name="pet_title">Pets</string>
+    <string name="health_title">Pet Health</string>
+    <string name="map_title">Map</string>
 </resources>
