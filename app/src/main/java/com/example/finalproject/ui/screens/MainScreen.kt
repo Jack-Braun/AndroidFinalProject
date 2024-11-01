@@ -25,22 +25,13 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.example.finalproject.R
-
-//The various screens in the app
-enum class PetScreen(@StringRes val title: Int) {
-    Home(R.string.home_title),
-    Profile(R.string.profile_title),
-    Pet(R.string.pet_title),
-    Health(R.string.health_title),
-    Map(R.string.map_title),
-}
+import com.example.finalproject.ui.components.PetScreens
 
 //The bar shown at the top of all screens
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PetAppBar(
-    currentScreen: PetScreen,
+    currentScreen: PetScreens,
     canNavigateBack: Boolean,
     navigateUp: () -> Unit,
     modifier: Modifier = Modifier
@@ -69,8 +60,8 @@ fun PetApp(
     navController: NavHostController = rememberNavController()
 ) {
     val backStackEntry by navController.currentBackStackEntryAsState()
-    val currentScreen = PetScreen.valueOf(
-        backStackEntry?.destination?.route ?: PetScreen.Home.name
+    val currentScreen = PetScreens.valueOf(
+        backStackEntry?.destination?.route ?: PetScreens.Home.name
     )
     Scaffold(
         topBar = {
@@ -83,14 +74,39 @@ fun PetApp(
     ) { innerPadding ->
         NavHost(
             navController = navController,
-            startDestination = PetScreen.Home.name,
+            startDestination = PetScreens.Home.name,
             modifier = Modifier
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
                 .padding(innerPadding)
         ) {
-            composable(route = PetScreen.Home.name) {
+            composable(route = PetScreens.Home.name) {
                 HomeScreen(modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp),
+                    onNavigate = {route -> navController.navigate(route)}
+                )
+            }
+            composable(route = PetScreens.Pet.name) {
+                PetScreen(modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp)
+                )
+            }
+            composable(route = PetScreens.Profile.name) {
+                ProfileScreen(modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp)
+                )
+            }
+            composable(route = PetScreens.Map.name) {
+                MapScreen(modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp)
+                )
+            }
+            composable(route = PetScreens.Health.name) {
+                HealthScreen(modifier = Modifier
                     .fillMaxSize()
                     .padding(16.dp)
                 )
