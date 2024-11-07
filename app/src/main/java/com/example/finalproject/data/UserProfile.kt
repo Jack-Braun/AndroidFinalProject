@@ -4,6 +4,7 @@ data class UserProfile(
     val username: String,
     val name: String,
     val password: String,
-    val bio: String
+    val bio: String,
+    val pets: List<Pet>
 )
 

@@ -2,8 +2,6 @@ package com.example.finalproject.ui.screens
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -27,6 +25,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.example.finalproject.data.Pet
 import com.example.finalproject.data.UserProfile
 import com.example.finalproject.ui.components.PetScreens
 
@@ -64,10 +63,15 @@ fun PetApp(
 ) {
 
     val testProfile = UserProfile(
-        username = "Steve",
+        username = "username",
         password = "password",
-        name = "Steve Smith",
-        bio = "I am a test profile"
+        name = "user name",
+        bio = "I am a test profile",
+        pets = listOf(
+            Pet(name = "Charlie", age = 13, animal = "Dog", colour = "White", breed = "Labrador Retriever"),
+            Pet(name = "Toby", age = 2, animal = "Dog", colour = "White / Brown", breed = "Red Heeler / Mix"),
+            Pet(name = "Jazzy", age = 4, animal = "Cat", colour = "White / Black", breed = "Unknown")
+        )
     )
 
     var isLoggedIn by remember { mutableStateOf(false) }
@@ -110,7 +114,6 @@ fun PetAppContent(
             startDestination = PetScreens.Home.name,
             modifier = Modifier
                 .fillMaxSize()
-                .verticalScroll(rememberScrollState())
                 .padding(innerPadding)
         ) {
             composable(route = PetScreens.Home.name) {
@@ -123,7 +126,8 @@ fun PetAppContent(
             composable(route = PetScreens.Pet.name) {
                 PetScreen(modifier = Modifier
                     .fillMaxSize()
-                    .padding(16.dp)
+                    .padding(16.dp),
+                    pets = userProfile.pets
                 )
             }
             composable(route = PetScreens.Profile.name) {
