@@ -24,12 +24,17 @@ import com.example.finalproject.data.UserProfile
 
 @Composable
 fun LoginScreen(
-    login: () -> Unit,
+    login: (String, String) -> Unit,
+    register: () -> Unit,
     userProfile: UserProfile
 ) {
     var username by remember { mutableStateOf("")}
     var password by remember { mutableStateOf("") }
     var errorMessage by remember { mutableStateOf("") }
+
+    userProfile?.let {
+
+    }
 
     Column(
         modifier = Modifier
@@ -44,7 +49,8 @@ fun LoginScreen(
             value = username,
             onValueChange = { username = it },
             label = { Text("Username") },
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            isError = errorMessage != null
         )
 
         OutlinedTextField(
@@ -52,17 +58,24 @@ fun LoginScreen(
             onValueChange = { password = it },
             label = { Text("Password") },
             modifier = Modifier.fillMaxWidth(),
-            visualTransformation = PasswordVisualTransformation()
+            visualTransformation = PasswordVisualTransformation(),
+            isError = errorMessage != null
         )
-        if (errorMessage.isNotEmpty()) {
-            Text(errorMessage, color = Color.Red)
-            Spacer(modifier = Modifier.height(8.dp))
+        errorMessage?.let {
+            Text(
+                text = it,
+                color = Color.Red,
+                modifier = Modifier.padding(8.dp)
+            )
         }
+        Spacer(modifier = Modifier.height(8.dp))
 
         Button(
             onClick = {
-                if (username == userProfile.username && password == userProfile.password) {
-                    login()
+                val isValidLogin = validateLogin(username, password)
+                if (isValidLogin) {
+                    login(username, password)
+                    errorMessage = ""
                 } else {
                     errorMessage = "Invalid username or password"
                 }
@@ -71,5 +84,20 @@ fun LoginScreen(
         ) {
             Text("Login")
         }
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Button(
+            onClick = {
+                register()
+            },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text("Register")
+        }
     }
+}
+
+fun validateLogin(username: String, password: String): Boolean {
+    return username.isNotBlank() && password.isNotBlank()
 }

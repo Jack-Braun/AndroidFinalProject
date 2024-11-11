@@ -9,7 +9,9 @@ enum class PetScreens(@StringRes val title: Int) {
     Profile(R.string.profile_title),
     Pet(R.string.pet_title),
     Health(R.string.health_title),
-    Map(R.string.map_title)
+    Map(R.string.map_title),
+    Register(R.string.register_title),
+    Login(R.string.login_title)
 }
 
 //A list of the screens for looping purposes

@@ -1,4 +1,4 @@
-package com.example.finalproject.ui.screens
+package com.example.finalproject
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -13,6 +13,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -25,9 +26,10 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.example.finalproject.data.Pet
-import com.example.finalproject.data.UserProfile
-import com.example.finalproject.ui.components.PetScreens
+
+import com.example.finalproject.data.*
+import com.example.finalproject.ui.components.*
+import com.example.finalproject.ui.screens.*
 
 //The bar shown at the top of all screens
 @OptIn(ExperimentalMaterial3Api::class)
@@ -62,80 +64,89 @@ fun PetApp(
     navController: NavHostController = rememberNavController()
 ) {
 
-    val testProfile = UserProfile(
-        username = "username",
-        password = "password",
-        name = "user name",
-        bio = "I am a test profile",
-        pets = listOf(
-            Pet(name = "Charlie", age = 13, animal = "Dog", colour = "White", breed = "Labrador Retriever"),
-            Pet(name = "Toby", age = 2, animal = "Dog", colour = "White / Brown", breed = "Red Heeler / Mix"),
-            Pet(name = "Jazzy", age = 4, animal = "Cat", colour = "White / Black", breed = "Unknown")
-        )
+    val profiles = remember { mutableStateOf<List<UserProfile>>(emptyList()) }
+
+    PetAppContent(
+        navController = navController,
+        profiles = profiles
     )
-
-    var isLoggedIn by remember { mutableStateOf(false) }
-
-    if (isLoggedIn) {
-        PetAppContent(
-            navController = navController,
-            userProfile = testProfile,
-            logout = { isLoggedIn = false }
-        )
-    } else {
-        LoginScreen(
-            login = { isLoggedIn = true },
-            userProfile = testProfile
-        )
-    }
 }
 
 @Composable
 fun PetAppContent(
     navController: NavHostController,
-    userProfile: UserProfile,
-    logout: () -> Unit
+    profiles: MutableState<List<UserProfile>>
 ) {
+    var isLoggedIn by remember { mutableStateOf(false) }
+    var currentUserProfile by remember { mutableStateOf<UserProfile?>(null) }
+
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentScreen = PetScreens.valueOf(
         backStackEntry?.destination?.route ?: PetScreens.Home.name
     )
+
     Scaffold(
         topBar = {
             PetAppBar(
                 currentScreen = currentScreen,
                 canNavigateBack = navController.previousBackStackEntry != null,
-                navigateUp = {navController.navigateUp()}
+                navigateUp = { navController.navigateUp() }
             )
         }
     ) { innerPadding ->
         NavHost(
             navController = navController,
-            startDestination = PetScreens.Home.name,
+            startDestination = PetScreens.Login.name,
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
         ) {
+            composable(route = PetScreens.Login.name) {
+                LoginScreen(
+                    login = { username, password ->
+                        currentUserProfile = profiles.value.find { it.username == username && it.password == password }
+                        isLoggedIn = true
+                        navController.navigate(PetScreens.Home.name)
+                    },
+                    userProfile = currentUserProfile ?: UserProfile(
+                        username = "",
+                        password = "",
+                        name = "",
+                        bio = "",
+                        pets = emptyList()
+                    ),
+                    register = { navController.navigate(PetScreens.Register.name) }
+                )
+            }
             composable(route = PetScreens.Home.name) {
-                HomeScreen(modifier = Modifier
-                    .fillMaxSize()
-                    .padding(16.dp),
-                    onNavigate = {route -> navController.navigate(route)}
+                HomeScreen(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(16.dp),
+                    onNavigate = { route -> navController.navigate(route) }
                 )
             }
             composable(route = PetScreens.Pet.name) {
-                PetScreen(modifier = Modifier
-                    .fillMaxSize()
-                    .padding(16.dp),
-                    pets = userProfile.pets
+                PetScreen(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(16.dp),
+                    pets = currentUserProfile?.pets ?: emptyList()
                 )
             }
             composable(route = PetScreens.Profile.name) {
-                ProfileScreen(modifier = Modifier
-                    .fillMaxSize()
-                    .padding(16.dp),
-                    userProfile = userProfile,
-                    logout = logout
+                ProfileScreen(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(16.dp),
+                    userProfile = currentUserProfile ?: UserProfile(
+                        username="",
+                        password="",
+                        name="",
+                        bio="",
+                        pets = emptyList()
+                    ),
+                    logout = { isLoggedIn = false; navController.navigate("Login") }
                 )
             }
             composable(route = PetScreens.Map.name) {
@@ -148,6 +159,21 @@ fun PetAppContent(
                 HealthScreen(modifier = Modifier
                     .fillMaxSize()
                     .padding(16.dp)
+                )
+            }
+            composable(route = PetScreens.Register.name) {
+                RegisterScreen(
+                    register = { username, password ->
+                        val newProfile = UserProfile(
+                            username = username,
+                            password = password,
+                            name = "Name",
+                            bio = "Bio",
+                            pets = emptyList()
+                        )
+                        profiles.value += newProfile
+                        navController.popBackStack()
+                    }
                 )
             }
         }
