@@ -136,7 +136,8 @@ fun PetAppContent(
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(16.dp),
-                    pets = currentUserProfile?.pets ?: emptyList()
+                    pets = currentUserProfile?.pets ?: emptyList(),
+                    onNavigateToNewPet = {navController.navigate(PetScreens.NewPet.name)}
                 )
             }
             composable(route = PetScreens.Profile.name) {
@@ -179,6 +180,14 @@ fun PetAppContent(
                         profiles.value += newProfile
                         navController.popBackStack()
                     }
+                )
+            }
+            composable(route = PetScreens.NewPet.name) {
+                NewPetScreen (
+                    addPet = { newPet ->
+                        currentUserProfile?.pets = currentUserProfile?.pets.orEmpty() + newPet
+                    },
+                    onNavigateBack = {navController.popBackStack()}
                 )
             }
         }

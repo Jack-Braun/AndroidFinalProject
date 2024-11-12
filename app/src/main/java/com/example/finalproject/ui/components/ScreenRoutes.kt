@@ -11,7 +11,8 @@ enum class PetScreens(@StringRes val title: Int) {
     Health(R.string.health_title),
     Map(R.string.map_title),
     Register(R.string.register_title),
-    Login(R.string.login_title)
+    Login(R.string.login_title),
+    NewPet(R.string.new_pet_title)
 }
 
 //A list of the screens for looping purposes

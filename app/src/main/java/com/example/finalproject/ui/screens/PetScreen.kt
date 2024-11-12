@@ -1,6 +1,8 @@
 package com.example.finalproject.ui.screens
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -11,8 +13,11 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.sharp.AccountCircle
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -28,16 +33,35 @@ import com.example.finalproject.data.Pet
 @Composable
 fun PetScreen(
     modifier: Modifier = Modifier,
-    pets: List<Pet>
+    pets: List<Pet>,
+    onNavigateToNewPet: () -> Unit
 ) {
-    LazyColumn(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(16.dp)
-    ) {
-        items(pets) { pet ->
-            PetItem(pet = pet)
-            Spacer(modifier = Modifier.height(8.dp))
+    Box(modifier = modifier.fillMaxSize()) {
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp)
+        ) {
+            items(pets) { pet ->
+                PetItem(pet = pet)
+                Spacer(modifier = Modifier.height(8.dp))
+            }
+        }
+
+        // Floating Action Button to navigate to AddPetScreen
+        FloatingActionButton(
+            onClick = onNavigateToNewPet,
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .padding(16.dp)
+        ) {
+            Column (
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ){
+                Text("Add New Pet", Modifier.padding(8.dp))
+                Icon(Icons.Filled.Add, contentDescription = "Add Pet", Modifier.padding(8.dp))
+            }
         }
     }
 }
