@@ -78,7 +78,10 @@ fun PetAppContent(
     profiles: MutableState<List<UserProfile>>
 ) {
     var isLoggedIn by remember { mutableStateOf(false) }
+    var incorrectLogin by remember { mutableStateOf(false) }
     var currentUserProfile by remember { mutableStateOf<UserProfile?>(null) }
+
+
 
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentScreen = PetScreens.valueOf(
@@ -104,18 +107,20 @@ fun PetAppContent(
             composable(route = PetScreens.Login.name) {
                 LoginScreen(
                     login = { username, password ->
-                        currentUserProfile = profiles.value.find { it.username == username && it.password == password }
-                        isLoggedIn = true
-                        navController.navigate(PetScreens.Home.name)
+                        currentUserProfile = profiles.value.find {
+                            it.username == username && it.password == password
+                        }
+                        if(currentUserProfile != null) {
+                            isLoggedIn = true
+                            incorrectLogin = false
+                            navController.navigate(PetScreens.Home.name)
+                        } else {
+                            incorrectLogin = true
+                        }
+
                     },
-                    userProfile = currentUserProfile ?: UserProfile(
-                        username = "",
-                        password = "",
-                        name = "",
-                        bio = "",
-                        pets = emptyList()
-                    ),
-                    register = { navController.navigate(PetScreens.Register.name) }
+                    register = { navController.navigate(PetScreens.Register.name) },
+                    incorrectLogin = incorrectLogin
                 )
             }
             composable(route = PetScreens.Home.name) {
