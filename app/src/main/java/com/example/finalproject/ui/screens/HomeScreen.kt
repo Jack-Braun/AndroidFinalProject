@@ -52,7 +52,7 @@ fun HomeScreen(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Spacer(modifier = Modifier.weight(1f)) // Pushes the button to the right
+            Spacer(modifier = Modifier.weight(1f))
             Button(
                 onClick = { droppedDown = !droppedDown },
                 modifier = Modifier
@@ -75,7 +75,7 @@ fun HomeScreen(
                     text = {
                         Text(
                             text = stringResource(screen.title),
-                            modifier = Modifier.widthIn(min = 250.dp)
+                            modifier = Modifier.fillMaxWidth()
                         )
                     }
                 )

@@ -47,8 +47,6 @@ fun PetScreen(
                 Spacer(modifier = Modifier.height(8.dp))
             }
         }
-
-        // Floating Action Button to navigate to AddPetScreen
         FloatingActionButton(
             onClick = onNavigateToNewPet,
             modifier = Modifier
@@ -69,7 +67,6 @@ fun PetScreen(
 @Composable
 fun PetItem(pet: Pet) {
     var isExpanded by remember { mutableStateOf(false) }
-
     Card(
         modifier = Modifier
             .fillMaxWidth()
