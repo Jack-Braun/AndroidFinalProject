@@ -1,11 +1,18 @@
 package com.example.finalproject.ui.screens
 
+import android.graphics.Paint.Align
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.Button
@@ -26,29 +33,33 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.finalproject.R
+import com.example.finalproject.data.UserProfile
 import com.example.finalproject.ui.components.screens
 import com.example.finalproject.ui.theme.FinalProjectTheme
 
 @Composable
 fun HomeScreen(
     modifier: Modifier = Modifier,
-    onNavigate: (String) -> Unit
+    onNavigate: (String) -> Unit,
+    profiles: List<UserProfile>
 ) {
     var droppedDown by remember { mutableStateOf(false) }
-
     Column(
         modifier = modifier,
-//        verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Button(
-            onClick = { droppedDown = !droppedDown },
-            //CHANGE THE WAY ITS CENTERED
-            modifier = Modifier
-                .padding(start = 210.dp)
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Text("Navigation")
-            Icon(Icons.Filled.ArrowDropDown, contentDescription = null)
+            Spacer(modifier = Modifier.weight(1f)) // Pushes the button to the right
+            Button(
+                onClick = { droppedDown = !droppedDown },
+                modifier = Modifier
+            ) {
+                Text("Navigation")
+                Icon(Icons.Filled.ArrowDropDown, contentDescription = null)
+            }
         }
 
         DropdownMenu(
@@ -64,12 +75,13 @@ fun HomeScreen(
                     text = {
                         Text(
                             text = stringResource(screen.title),
-                            modifier = modifier.widthIn(min = 250.dp)
+                            modifier = Modifier.widthIn(min = 250.dp)
                         )
                     }
                 )
             }
         }
+
         Text(text = "Pet App", fontSize = 24.sp)
         Image(
             painter = painterResource(id = R.drawable.dog_logo),
@@ -78,8 +90,32 @@ fun HomeScreen(
                 .size(192.dp)
                 .padding(8.dp)
         )
+        Spacer(modifier = Modifier.height(8.dp))
 
+        Text("Other Users")
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+        ) {
+            items(profiles) {profile ->
+                ProfileItem(profile)
+                Spacer(modifier = Modifier.height(8.dp))
+            }
+        }
+    }
+}
 
+@Composable
+fun ProfileItem(profile: UserProfile) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp)
+    ) {
+        Text(text = "Username: ${profile.username}")
+        Text(text = "Name: ${profile.name}")
+        Text(text = "Bio: ${profile.bio}")
     }
 }
 
@@ -100,10 +136,10 @@ fun HomeScreen(
 //    )
 //}
 
-@Preview
-@Composable
-fun HomePreview() {
-    FinalProjectTheme {
-        HomeScreen(onNavigate = {})
-    }
-}
+//@Preview
+//@Composable
+//fun HomePreview() {
+//    FinalProjectTheme {
+//        HomeScreen(onNavigate = {})
+//    }
+//}

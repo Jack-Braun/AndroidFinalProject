@@ -128,7 +128,8 @@ fun PetAppContent(
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(16.dp),
-                    onNavigate = { route -> navController.navigate(route) }
+                    onNavigate = { route -> navController.navigate(route) },
+                    profiles = profiles.value.filter { it.username != currentUserProfile?.username }
                 )
             }
             composable(route = PetScreens.Pet.name) {
