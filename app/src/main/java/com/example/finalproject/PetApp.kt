@@ -1,5 +1,10 @@
 package com.example.finalproject
 
+import android.content.ContentValues
+import android.content.Context
+import android.database.SQLException
+import android.net.Uri
+import android.widget.Toast
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -170,15 +175,8 @@ fun PetAppContent(
             }
             composable(route = PetScreens.Register.name) {
                 RegisterScreen(
-                    register = { username, password ->
-                        val newProfile = UserProfile(
-                            username = username,
-                            password = password,
-                            name = "Name",
-                            bio = "Bio",
-                            pets = emptyList()
-                        )
-                        profiles.value += newProfile
+                    register = { username, password, name, bio ->
+                        registerNewUser(context = navController.context, username, password, name, bio)
                         navController.popBackStack()
                     }
                 )
@@ -193,4 +191,39 @@ fun PetAppContent(
             }
         }
     }
+}
+
+//Creating new user and sending to the database
+fun registerNewUser(context: Context, username: String, password: String, name: String, bio: String) {
+    val values = ContentValues().apply {
+        put("username", username)
+        put("password", password)
+        put("name", name)
+        put("bio", bio)
+    }
+
+    try {
+        val uri = context.contentResolver.insert(PetAppContentProvider.CONTENT_URI, values)
+
+        if (uri != null) {
+            Toast.makeText(context, "Profile created", Toast.LENGTH_SHORT).show()
+        } else {
+            Toast.makeText(context, "Failed to create profile", Toast.LENGTH_SHORT).show()
+        }
+    } catch (e: SQLException) {
+        Toast.makeText(context, "Username already exists.", Toast.LENGTH_LONG).show()
+    }
+}
+
+//Ensuring usernames are unique
+fun isUsernameTaken(context: Context, username: String): Boolean {
+    val uri = Uri.parse("content://com.example.finalproject/users")
+    val projection = arrayOf("username")
+    val selection = "username = ?"
+    val selectionArgs = arrayOf(username)
+
+    val cursor = context.contentResolver.query(uri, projection, selection, selectionArgs, null)
+    val isTaken = (cursor?.count ?: 0) > 0
+    cursor?.close()
+    return isTaken
 }

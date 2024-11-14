@@ -5,5 +5,6 @@ data class Pet(
     val age: Int,
     val animal: String,
     val colour: String,
-    val breed: String
+    val breed: String,
+    val owner: String
 )

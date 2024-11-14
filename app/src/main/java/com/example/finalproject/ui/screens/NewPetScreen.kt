@@ -88,7 +88,9 @@ fun NewPetScreen(
                             age = age.toIntOrNull() ?: 0,
                             animal = animal,
                             colour = colour,
-                            breed = breed
+                            breed = breed,
+                            //FINISH THIS LATER
+                            owner = ""
                         )
                     )
                     onNavigateBack()
