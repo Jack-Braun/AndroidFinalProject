@@ -1,5 +1,7 @@
 package com.example.finalproject.ui.screens
 
+import android.content.Context
+import android.net.Uri
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -18,6 +20,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 
@@ -25,10 +28,12 @@ import androidx.compose.ui.unit.dp
 fun LoginScreen(
     login: (String, String) -> Unit,
     register: () -> Unit,
-    incorrectLogin: Boolean
 ) {
     var username by remember { mutableStateOf("")}
     var password by remember { mutableStateOf("") }
+    var incorrectLogin by remember{ mutableStateOf(false) }
+    val context = LocalContext.current
+
 
     Column(
         modifier = Modifier
@@ -56,17 +61,23 @@ fun LoginScreen(
 
         Spacer(modifier = Modifier.height(8.dp))
 
+        if(incorrectLogin) {
+            Text(text = "Invalid Login", color = Color.Red)
+        }
+
         Button(
             onClick = {
-               login(username, password)
+
+                if (validateLogin(context, username, password)) {
+                    incorrectLogin = false
+                    login(username, password)
+                } else {
+                    incorrectLogin = true
+                }
             },
             modifier = Modifier.fillMaxWidth()
         ) {
             Text("Login")
-        }
-
-        if(incorrectLogin) {
-            Text(text = "Invalid Login", color = Color.Red)
         }
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -80,4 +91,16 @@ fun LoginScreen(
             Text("Register")
         }
     }
+}
+
+fun validateLogin(context: Context, username: String, password: String): Boolean {
+    val uri = Uri.parse("content://com.example.finalproject/users")
+    val projection = arrayOf("username", "password")
+    val selection = "username = ? AND password = ?"
+    val selectionArgs = arrayOf(username, password)
+
+    val cursor = context.contentResolver.query(uri, projection, selection, selectionArgs, null)
+    val isValid = (cursor?.count ?: 0) > 0
+    cursor?.close()
+    return isValid
 }

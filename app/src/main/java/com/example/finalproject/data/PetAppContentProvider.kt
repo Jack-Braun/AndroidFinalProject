@@ -14,75 +14,67 @@ import android.net.Uri
 
 class PetAppContentProvider : ContentProvider() {
     companion object {
-        // defining authority so that other application can access it
+        // Defining authority so that other applications can access it
         const val PROVIDER_NAME = "com.example.finalproject"
 
-        // defining content URI
-        const val URL = "content://$PROVIDER_NAME/users"
+        // Defining content URI
+        const val URL = "content://$PROVIDER_NAME/pets"
 
-        // parsing the content URI
-        val CONTENT_URI = Uri.parse(URL)
+        // Parsing the content URI for pets
+        val PET_CONTENT_URI = Uri.parse(URL)
         const val id = "id"
         const val name = "name"
-        const val uriCodeUsers = 1
-        const val uriCodeUserId = 2
+        const val uriCodePets = 1
+        const val uriCodePetId = 2
+        const val uriCodeUsers = 3
+        const val uriCodeUserId = 4
+
         var uriMatcher: UriMatcher? = null
-        private val values: HashMap<String, String>? = null
 
-        // declaring name of the database
+        // Declaring name and version of the database
         const val DATABASE_NAME = "PetAppDB"
-
-        // declaring version of the database
         const val DATABASE_VERSION = 1
 
-        // declaring table name of the database
-        const val TABLE_NAME = "Users"
+        // Declaring tables for users and pets
+        const val USER_TABLE_NAME = "Users"
+        const val PET_TABLE_NAME = "Pets"
 
-        // Table for UserProfile
+        // Create user profile table
         const val CREATE_USER_PROFILE_TABLE = """
-    CREATE TABLE $TABLE_NAME (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        username TEXT NOT NULL UNIQUE,
-        name TEXT NOT NULL,
-        password TEXT NOT NULL,
-        bio TEXT
-    );
-"""
+            CREATE TABLE $USER_TABLE_NAME (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                username TEXT NOT NULL UNIQUE,
+                name TEXT NOT NULL,
+                password TEXT NOT NULL,
+                bio TEXT
+            );
+        """
 
-        // Table for Pets
-        object PetTable {
-            const val TABLE_NAME = "Pets"
-        }
-
+        // Create pet table
         const val CREATE_PET_TABLE = """
-    CREATE TABLE ${PetTable.TABLE_NAME} (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name TEXT NOT NULL,
-        age INTEGER NOT NULL,
-        animal TEXT NOT NULL,
-        colour TEXT NOT NULL,
-        breed TEXT NOT NULL,
-        owner TEXT NOT NULL,
-        FOREIGN KEY (owner) REFERENCES $TABLE_NAME(username)
-    );
-"""
+            CREATE TABLE $PET_TABLE_NAME (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name TEXT NOT NULL,
+                age INTEGER NOT NULL,
+                animal TEXT NOT NULL,
+                colour TEXT NOT NULL,
+                breed TEXT NOT NULL,
+                owner TEXT NOT NULL,
+                FOREIGN KEY (owner) REFERENCES $USER_TABLE_NAME(username)
+            );
+        """
 
         init {
             uriMatcher = UriMatcher(UriMatcher.NO_MATCH)
+            uriMatcher!!.addURI(PROVIDER_NAME, "pets", uriCodePets)
+            uriMatcher!!.addURI(PROVIDER_NAME, "pets/#", uriCodePetId)
             uriMatcher!!.addURI(PROVIDER_NAME, "users", uriCodeUsers)
             uriMatcher!!.addURI(PROVIDER_NAME, "users/*", uriCodeUserId)
         }
     }
 
-    override fun getType(uri: Uri): String? {
-        return when (uriMatcher!!.match(uri)) {
-            uriCodeUsers -> "vnd.android.cursor.dir/users"
-            uriCodeUserId -> "vnd.android.cursor.item/user"
-            else -> throw IllegalArgumentException("Unsupported URI: $uri")
-        }
-    }
+    private var db: SQLiteDatabase? = null
 
-    // creating the database
     override fun onCreate(): Boolean {
         val context = context
         val dbHelper = DatabaseHelper(context)
@@ -90,16 +82,23 @@ class PetAppContentProvider : ContentProvider() {
         return db != null
     }
 
-    override fun query(uri: Uri, projection: Array<String>?, selection: String?,
-                       selectionArgs: Array<String>?, sortOrder: String?): Cursor? {
+    override fun query(
+        uri: Uri, projection: Array<String>?, selection: String?,
+        selectionArgs: Array<String>?, sortOrder: String?
+    ): Cursor? {
         val qb = SQLiteQueryBuilder()
         when (uriMatcher!!.match(uri)) {
-            uriCodeUsers -> qb.tables = TABLE_NAME
+            uriCodePets -> qb.tables = PET_TABLE_NAME
+            uriCodePetId -> {
+                qb.tables = PET_TABLE_NAME
+                qb.appendWhere("id = ?") // For a specific pet
+            }
+            uriCodeUsers -> qb.tables = USER_TABLE_NAME
             uriCodeUserId -> {
-                qb.tables = TABLE_NAME
+                qb.tables = USER_TABLE_NAME
                 qb.appendWhere("username = ?") // For a specific user
             }
-            else -> throw IllegalArgumentException("Unknown URI $uri")
+            else -> throw IllegalArgumentException("Unknown URI: $uri")
         }
 
         val c = qb.query(db, projection, selection, selectionArgs, null, null, sortOrder)
@@ -107,42 +106,62 @@ class PetAppContentProvider : ContentProvider() {
         return c
     }
 
-    // adding data to the database
     override fun insert(uri: Uri, values: ContentValues?): Uri? {
-        val rowID = db!!.insert(TABLE_NAME, "", values)
+        val rowID: Long
+        when (uriMatcher!!.match(uri)) {
+            uriCodePets -> {
+                rowID = db!!.insert(PET_TABLE_NAME, "", values)
+            }
+            uriCodeUsers -> {
+                rowID = db!!.insert(USER_TABLE_NAME, "", values)
+            }
+            else -> throw IllegalArgumentException("Unknown URI: $uri")
+        }
+
         if (rowID > 0) {
-            val _uri =
-                ContentUris.withAppendedId(CONTENT_URI, rowID)
+            val _uri = ContentUris.withAppendedId(uri, rowID)
             context!!.contentResolver.notifyChange(_uri, null)
             return _uri
         }
         throw SQLiteException("Failed to add a record into $uri")
     }
 
-    override fun update(uri: Uri, values: ContentValues?, selection: String?,
-                        selectionArgs: Array<String>?): Int {
+    override fun update(
+        uri: Uri, values: ContentValues?, selection: String?,
+        selectionArgs: Array<String>?
+    ): Int {
         val count = when (uriMatcher!!.match(uri)) {
-            uriCodeUsers -> db!!.update(TABLE_NAME, values, selection, selectionArgs)
-            else -> throw IllegalArgumentException("Unknown URI $uri")
+            uriCodePets -> db!!.update(PET_TABLE_NAME, values, selection, selectionArgs)
+            uriCodeUsers -> db!!.update(USER_TABLE_NAME, values, selection, selectionArgs)
+            else -> throw IllegalArgumentException("Unknown URI: $uri")
         }
         context!!.contentResolver.notifyChange(uri, null)
         return count
     }
 
-    override fun delete(uri: Uri, selection: String?, selectionArgs: Array<String>?): Int {
+    override fun delete(
+        uri: Uri, selection: String?, selectionArgs: Array<String>?
+    ): Int {
         val count = when (uriMatcher!!.match(uri)) {
-            uriCodeUsers -> db!!.delete(TABLE_NAME, selection, selectionArgs)
-            else -> throw IllegalArgumentException("Unknown URI $uri")
+            uriCodePets -> db!!.delete(PET_TABLE_NAME, selection, selectionArgs)
+            uriCodeUsers -> db!!.delete(USER_TABLE_NAME, selection, selectionArgs)
+            else -> throw IllegalArgumentException("Unknown URI: $uri")
         }
         context!!.contentResolver.notifyChange(uri, null)
         return count
     }
 
-    // creating object of database
-    // to perform query
-    private var db: SQLiteDatabase? = null
+    override fun getType(uri: Uri): String? {
+        return when (uriMatcher!!.match(uri)) {
+            uriCodePets -> "vnd.android.cursor.dir/$PROVIDER_NAME.pets"
+            uriCodePetId -> "vnd.android.cursor.item/$PROVIDER_NAME.pets"
+            uriCodeUsers -> "vnd.android.cursor.dir/$PROVIDER_NAME.users"
+            uriCodeUserId -> "vnd.android.cursor.item/$PROVIDER_NAME.users"
+            else -> throw IllegalArgumentException("Unknown URI: $uri")
+        }
+    }
 
-    // creating a database
+    // Database helper class
     private class DatabaseHelper(context: Context?) : SQLiteOpenHelper(
         context, DATABASE_NAME, null, DATABASE_VERSION
     ) {
@@ -152,8 +171,8 @@ class PetAppContentProvider : ContentProvider() {
         }
 
         override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
-            db.execSQL("DROP TABLE IF EXISTS $TABLE_NAME")
-            db.execSQL("DROP TABLE IF EXISTS ${PetTable.TABLE_NAME}")
+            db.execSQL("DROP TABLE IF EXISTS $USER_TABLE_NAME")
+            db.execSQL("DROP TABLE IF EXISTS $PET_TABLE_NAME")
             onCreate(db)
         }
     }
