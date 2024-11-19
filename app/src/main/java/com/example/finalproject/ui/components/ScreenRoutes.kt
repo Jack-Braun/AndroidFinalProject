@@ -12,8 +12,11 @@ enum class PetScreens(@StringRes val title: Int) {
     Map(R.string.map_title),
     Register(R.string.register_title),
     Login(R.string.login_title),
-    NewPet(R.string.new_pet_title)
+    NewPet(R.string.new_pet_title),
+    EditProfile(R.string.edit_profile_screen),
+    EditPet(R.string.edit_pet_screen)
 }
+
 
 //A list of the screens for looping purposes
 val screens = listOf(

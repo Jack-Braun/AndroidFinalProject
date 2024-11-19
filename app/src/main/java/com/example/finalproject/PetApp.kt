@@ -18,7 +18,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -47,7 +46,7 @@ fun PetAppBar(
     modifier: Modifier = Modifier
 ) {
     TopAppBar(
-        title = {Text(stringResource(currentScreen.title))},
+        title = {Text(currentScreen.name)},
         colors = TopAppBarDefaults.mediumTopAppBarColors(
             containerColor = MaterialTheme.colorScheme.primaryContainer
         ),
@@ -120,8 +119,10 @@ fun PetAppContent(
                             currentUserProfile = UserProfile(
                                 username = userCursor.getString(userCursor.getColumnIndexOrThrow("username")),
                                 password = userCursor.getString(userCursor.getColumnIndexOrThrow("password")),
-                                name = userCursor.getString(userCursor.getColumnIndexOrThrow("name")) ?: "Not Set",
-                                bio = userCursor.getString(userCursor.getColumnIndexOrThrow("bio")) ?: "Not Set",
+                                name = userCursor.getString(userCursor.getColumnIndexOrThrow("name"))
+                                    ?: "Not Set",
+                                bio = userCursor.getString(userCursor.getColumnIndexOrThrow("bio"))
+                                    ?: "Not Set",
                                 pets = getUserPets(context, username)
                             )
                             pets = currentUserProfile?.pets ?: emptyList()
@@ -142,7 +143,7 @@ fun PetAppContent(
                         .fillMaxSize()
                         .padding(16.dp),
                     onNavigate = { route -> navController.navigate(route) },
-                    profiles = profiles.filter{it.username != currentUserProfile?.username}
+                    profiles = profiles.filter { it.username != currentUserProfile?.username }
                 )
             }
             composable(route = PetScreens.Pet.name) {
@@ -161,31 +162,40 @@ fun PetAppContent(
                         .padding(16.dp),
                     //has a default UserProfile in case something goes wrong
                     userProfile = currentUserProfile ?: UserProfile(
-                        username="",
-                        password="",
-                        name="",
-                        bio="",
+                        username = "",
+                        password = "",
+                        name = "",
+                        bio = "",
                         pets = emptyList()
                     ),
-                    logout = { isLoggedIn = false; navController.navigate("Login") }
+                    logout = { isLoggedIn = false; navController.navigate("Login") },
+                    onEditProfile = { navController.navigate(PetScreens.EditProfile.name) }
                 )
             }
             composable(route = PetScreens.Map.name) {
-                MapScreen(modifier = Modifier
-                    .fillMaxSize()
-                    .padding(16.dp)
+                MapScreen(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(16.dp)
                 )
             }
             composable(route = PetScreens.Health.name) {
-                HealthScreen(modifier = Modifier
-                    .fillMaxSize()
-                    .padding(16.dp)
+                HealthScreen(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(16.dp)
                 )
             }
             composable(route = PetScreens.Register.name) {
                 RegisterScreen(
                     register = { username, password, name, bio ->
-                        registerNewUser(context = navController.context, username, password, name, bio)
+                        registerNewUser(
+                            context = navController.context,
+                            username,
+                            password,
+                            name,
+                            bio
+                        )
                         navController.popBackStack()
                     }
                 )
@@ -201,16 +211,45 @@ fun PetAppContent(
                     }
                 )
             }
+            composable(route = PetScreens.EditProfile.name) {
+                currentUserProfile?.let { profile ->
+                    EditProfileScreen(
+                        userProfile = profile,
+                        updateUserProfile = { name, bio, username ->
+                            updateUserProfileInDB(
+                                context = navController.context,
+                                username,
+                                name,
+                                bio
+                            )
+                            currentUserProfile = currentUserProfile?.copy(name = name, bio = bio)
+                        },
+                        onNavigateBack = { navController.popBackStack() }
+                    )
+                }
+            }
         }
     }
 }
 
+fun updateUserProfileInDB(context: Context, username: String, name: String, bio: String) {
+    val values = ContentValues().apply {
+        put("name", name)
+        put("bio", bio)
+    }
+    context.contentResolver.update(
+        Uri.parse("content://com.example.finalproject/users"),
+        values,
+        "username = ?",
+        arrayOf(username)
+    )
+}
+
 fun getUserPets(context: Context, username: String): List<Pet> {
     val pets = mutableListOf<Pet>()
-
     val petsCursor = context.contentResolver.query(
         PetAppContentProvider.PET_CONTENT_URI,
-        arrayOf("name", "age", "animal", "colour", "breed"),
+        arrayOf("id", "name", "age", "animal", "colour", "breed"),
         "owner = ?",
         arrayOf(username),
         null
@@ -219,6 +258,7 @@ fun getUserPets(context: Context, username: String): List<Pet> {
     petsCursor?.use {
         while (it.moveToNext()) {
             val pet = Pet(
+                id = it.getInt(it.getColumnIndexOrThrow("id")),
                 name = it.getString(it.getColumnIndexOrThrow("name")),
                 age = it.getInt(it.getColumnIndexOrThrow("age")),
                 animal = it.getString(it.getColumnIndexOrThrow("animal")),

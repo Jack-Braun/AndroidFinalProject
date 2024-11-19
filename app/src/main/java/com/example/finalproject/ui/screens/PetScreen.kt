@@ -43,7 +43,10 @@ fun PetScreen(
                 .padding(16.dp)
         ) {
             items(pets) { pet ->
-                PetItem(pet = pet)
+                PetItem(
+                    pet = pet,
+                    onEdit = {}
+                )
                 Spacer(modifier = Modifier.height(8.dp))
             }
         }
@@ -65,7 +68,10 @@ fun PetScreen(
 }
 
 @Composable
-fun PetItem(pet: Pet) {
+fun PetItem(
+    pet: Pet,
+    onEdit:(String) -> Unit
+) {
     var isExpanded by remember { mutableStateOf(false) }
     Card(
         modifier = Modifier
@@ -88,6 +94,14 @@ fun PetItem(pet: Pet) {
                 Text("Animal: ${pet.animal}")
                 Text("Colour: ${pet.colour}")
                 Text("Breed: ${pet.breed}")
+                Spacer(modifier = Modifier.height(8.dp))
+                Button(
+                    //fix later
+                    onClick = {},
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text("Edit Pet")
+                }
             }
         }
     }

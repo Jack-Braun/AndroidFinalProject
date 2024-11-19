@@ -15,7 +15,8 @@ import com.example.finalproject.data.UserProfile
 fun ProfileScreen(
     modifier: Modifier = Modifier,
     userProfile: UserProfile,
-    logout: () -> Unit
+    logout: () -> Unit,
+    onEditProfile: () -> Unit
 ) {
     Column(modifier = modifier,
         horizontalAlignment = Alignment.CenterHorizontally
@@ -27,8 +28,9 @@ fun ProfileScreen(
         Text("Username: ${userProfile.username}")
         Text("Full Name: ${userProfile.name}")
         Text("Bio: ${userProfile.bio}")
-        Button(onClick = {}) {
-            Text("Edit Profile(non functional)")
+
+        Button(onClick = onEditProfile) {
+            Text("Edit Profile")
         }
         Button(onClick = logout) {
             Text("Logout")

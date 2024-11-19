@@ -8,4 +8,6 @@
     <string name="register_title">Register</string>
     <string name="login_title">Login</string>
     <string name="new_pet_title">Add Pet</string>
+    <string name="edit_profile_screen">Edit Profile</string>
+    <string name="edit_pet_screen">Edit Pet</string>
 </resources>
