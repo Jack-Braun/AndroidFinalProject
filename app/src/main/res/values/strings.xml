@@ -10,4 +10,5 @@
     <string name="new_pet_title">Add Pet</string>
     <string name="edit_profile_screen">Edit Profile</string>
     <string name="edit_pet_screen">Edit Pet</string>
+    <string name="title_activity_map_screen">Map</string>
 </resources>

@@ -173,11 +173,7 @@ fun PetAppContent(
                 )
             }
             composable(route = PetScreens.Map.name) {
-                MapScreen(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(16.dp)
-                )
+                MapScreen()
             }
             composable(route = PetScreens.Health.name) {
                 HealthScreen(

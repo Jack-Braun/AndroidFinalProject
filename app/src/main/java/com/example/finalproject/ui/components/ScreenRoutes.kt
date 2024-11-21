@@ -25,5 +25,5 @@ val screens = listOf(
     PetScreens.Profile,
     PetScreens.Pet,
 //    PetScreens.Health,
-//    PetScreens.Map
+    PetScreens.Map
 )
