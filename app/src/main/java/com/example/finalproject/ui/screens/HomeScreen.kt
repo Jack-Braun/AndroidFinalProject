@@ -2,6 +2,7 @@ package com.example.finalproject.ui.screens
 
 import android.graphics.Paint.Align
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -27,13 +28,18 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.example.finalproject.R
+import com.example.finalproject.data.Pet
 import com.example.finalproject.data.UserProfile
+import com.example.finalproject.getUserPets
 import com.example.finalproject.ui.components.screens
 import com.example.finalproject.ui.theme.FinalProjectTheme
 
@@ -99,7 +105,9 @@ fun HomeScreen(
                 .padding(16.dp)
         ) {
             items(profiles) {profile ->
-                ProfileItem(profile)
+                val pets = getUserPets(context = LocalContext.current, profile.username)
+
+                ProfileItem(profile, pets)
                 Spacer(modifier = Modifier.height(8.dp))
             }
         }
@@ -107,7 +115,9 @@ fun HomeScreen(
 }
 
 @Composable
-fun ProfileItem(profile: UserProfile) {
+fun ProfileItem(
+    profile: UserProfile,
+    pets: List<Pet>) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -116,30 +126,24 @@ fun ProfileItem(profile: UserProfile) {
         Text(text = "Username: ${profile.username}")
         Text(text = "Name: ${profile.name}")
         Text(text = "Bio: ${profile.bio}")
+        if(pets.isNotEmpty()) {
+            Spacer(modifier = Modifier.height(8.dp))
+            Text("Pets:")
+            pets.forEach {pet ->
+                Column(modifier = Modifier
+                    .fillMaxWidth()
+                    .background(color = Color.LightGray)
+                    .padding(16.dp)
+                ) {
+                    Text("Name: ${pet.name}")
+                    Text("Animal: ${pet.animal}")
+                    Text("Age: ${pet.age}")
+                    Text("Colour: ${pet.colour}")
+                    Text("Breed: ${pet.breed}")
+                }
+            }
+        } else {
+            Text("This user does not have any pets", color = Color.Red)
+        }
     }
 }
-
-//@Composable
-//fun NavigateScreens(
-//    @StringRes labelResourceId: Int,
-//    onClick: () -> Unit,
-//    modifier: Modifier = Modifier
-//) {
-//    DropdownMenuItem(
-//        onClick = onClick,
-//        text = {
-//            Text(
-//                text = stringResource(labelResourceId),
-//                modifier = modifier.widthIn(min = 250.dp)
-//            )
-//        }
-//    )
-//}
-
-//@Preview
-//@Composable
-//fun HomePreview() {
-//    FinalProjectTheme {
-//        HomeScreen(onNavigate = {})
-//    }
-//}

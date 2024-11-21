@@ -90,8 +90,8 @@ fun PetItem(
             Text(text = pet.name)
             if (isExpanded) {
                 Spacer(modifier = Modifier.height(8.dp))
-                Text("Age: ${pet.age}")
                 Text("Animal: ${pet.animal}")
+                Text("Age: ${pet.age}")
                 Text("Colour: ${pet.colour}")
                 Text("Breed: ${pet.breed}")
                 Spacer(modifier = Modifier.height(8.dp))
