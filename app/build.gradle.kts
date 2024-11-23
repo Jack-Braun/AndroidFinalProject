@@ -71,6 +71,11 @@ dependencies {
 
     implementation (libs.secrets.gradle.plugin)
 
+    //Used to fetch vancouver dog parks API
+    implementation(libs.kotlinx.coroutines.android)
+    implementation(libs.retrofit)
+    implementation(libs.converter.gson)
+
     implementation (libs.androidx.ui)
     implementation (libs.androidx.material)
     implementation (libs.play.services.location)
