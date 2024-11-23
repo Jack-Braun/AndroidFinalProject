@@ -1,7 +1,8 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
-    alias(libs.plugins.google.android.libraries.mapsplatform.secrets.gradle.plugin)
+
+    id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
 }
 
 android {
@@ -10,7 +11,7 @@ android {
 
     defaultConfig {
         applicationId = "com.example.finalproject"
-        minSdk = 24
+        minSdk = 21
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
@@ -20,6 +21,14 @@ android {
             useSupportLibrary = true
         }
     }
+
+    secrets {
+        propertiesFileName = "secrets.properties"
+        defaultPropertiesFileName = "local.defaults.properties"
+        ignoreList.add("keyToIgnore")
+        ignoreList.add("sdk.*")
+    }
+
 
     buildTypes {
         release {
@@ -40,6 +49,7 @@ android {
     buildFeatures {
         compose = true
         viewBinding = true
+        buildConfig = true
     }
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.1"
@@ -53,10 +63,17 @@ android {
 
 dependencies {
 
-    // Google Maps
-    implementation (libs.maps.compose)
-    implementation (libs.play.services.maps)
+    //Google Maps
+    implementation(libs.maps.compose)
+    implementation(libs.play.services.maps)
+    implementation(libs.maps.ktx)
+    implementation(libs.maps.utils.ktx)
 
+    implementation (libs.secrets.gradle.plugin)
+
+    implementation (libs.androidx.ui)
+    implementation (libs.androidx.material)
+    implementation (libs.play.services.location)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)

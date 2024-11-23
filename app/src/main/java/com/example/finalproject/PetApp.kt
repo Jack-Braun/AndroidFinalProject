@@ -35,6 +35,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.finalproject.data.*
 import com.example.finalproject.ui.components.*
 import com.example.finalproject.ui.screens.*
+import com.google.android.gms.maps.model.LatLng
 
 //The bar shown at the top of all screens
 @OptIn(ExperimentalMaterial3Api::class)
@@ -172,7 +173,7 @@ fun PetAppContent(
                     onEditProfile = { navController.navigate(PetScreens.EditProfile.name) }
                 )
             }
-            composable(route = PetScreens.Map.name) {
+            composable(route = PetScreens.Map.name) { backStackEntry ->
                 MapScreen()
             }
             composable(route = PetScreens.Health.name) {

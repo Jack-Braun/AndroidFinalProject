@@ -13,3 +13,7 @@
 .externalNativeBuild
 .cxx
 local.properties
+
+map_key.xml
+secrets.properties
+local.defaults.properties
