@@ -11,6 +11,7 @@ import android.database.sqlite.SQLiteException
 import android.database.sqlite.SQLiteOpenHelper
 import android.database.sqlite.SQLiteQueryBuilder
 import android.net.Uri
+import android.util.Log
 
 class PetAppContentProvider : ContentProvider() {
     companion object {
@@ -28,6 +29,8 @@ class PetAppContentProvider : ContentProvider() {
         const val uriCodePetId = 2
         const val uriCodeUsers = 3
         const val uriCodeUserId = 4
+        const val uriCodeEvents = 5
+        const val uriCodeEventId = 6
 
         var uriMatcher: UriMatcher? = null
 
@@ -38,6 +41,7 @@ class PetAppContentProvider : ContentProvider() {
         // Declaring tables for users and pets
         const val USER_TABLE_NAME = "Users"
         const val PET_TABLE_NAME = "Pets"
+        const val EVENT_TABLE_NAME = "Events"
 
         // Create user profile table
         const val CREATE_USER_PROFILE_TABLE = """
@@ -64,12 +68,24 @@ class PetAppContentProvider : ContentProvider() {
             );
         """
 
+        const val CREATE_EVENTS_TABLE = """
+    CREATE TABLE $EVENT_TABLE_NAME (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT NOT NULL,
+        address TEXT NOT NULL,
+        date TEXT NOT NULL,
+        attendees TEXT
+    );
+"""
+
         init {
             uriMatcher = UriMatcher(UriMatcher.NO_MATCH)
             uriMatcher!!.addURI(PROVIDER_NAME, "pets", uriCodePets)
             uriMatcher!!.addURI(PROVIDER_NAME, "pets/#", uriCodePetId)
             uriMatcher!!.addURI(PROVIDER_NAME, "users", uriCodeUsers)
             uriMatcher!!.addURI(PROVIDER_NAME, "users/*", uriCodeUserId)
+            uriMatcher!!.addURI(PROVIDER_NAME, "events", uriCodeEvents)
+            uriMatcher!!.addURI(PROVIDER_NAME, "events/#", uriCodeEventId)
         }
     }
 
@@ -91,12 +107,17 @@ class PetAppContentProvider : ContentProvider() {
             uriCodePets -> qb.tables = PET_TABLE_NAME
             uriCodePetId -> {
                 qb.tables = PET_TABLE_NAME
-                qb.appendWhere("id = ?") // For a specific pet
+                qb.appendWhere("id = ?")
             }
             uriCodeUsers -> qb.tables = USER_TABLE_NAME
             uriCodeUserId -> {
                 qb.tables = USER_TABLE_NAME
-                qb.appendWhere("username = ?") // For a specific user
+                qb.appendWhere("username = ?")
+            }
+            uriCodeEvents -> qb.tables = EVENT_TABLE_NAME
+            uriCodeEventId -> {
+                qb.tables = EVENT_TABLE_NAME
+                qb.appendWhere("id = ?")
             }
             else -> throw IllegalArgumentException("Unknown URI: $uri")
         }
@@ -114,6 +135,9 @@ class PetAppContentProvider : ContentProvider() {
             }
             uriCodeUsers -> {
                 rowID = db!!.insert(USER_TABLE_NAME, "", values)
+            }
+            uriCodeEvents -> {
+                rowID = db!!.insert(EVENT_TABLE_NAME, "", values)
             }
             else -> throw IllegalArgumentException("Unknown URI: $uri")
         }
@@ -133,6 +157,7 @@ class PetAppContentProvider : ContentProvider() {
         val count = when (uriMatcher!!.match(uri)) {
             uriCodePets -> db!!.update(PET_TABLE_NAME, values, selection, selectionArgs)
             uriCodeUsers -> db!!.update(USER_TABLE_NAME, values, selection, selectionArgs)
+            uriCodeEvents -> db!!.update(EVENT_TABLE_NAME, values, selection, selectionArgs)
             else -> throw IllegalArgumentException("Unknown URI: $uri")
         }
         context!!.contentResolver.notifyChange(uri, null)
@@ -145,6 +170,7 @@ class PetAppContentProvider : ContentProvider() {
         val count = when (uriMatcher!!.match(uri)) {
             uriCodePets -> db!!.delete(PET_TABLE_NAME, selection, selectionArgs)
             uriCodeUsers -> db!!.delete(USER_TABLE_NAME, selection, selectionArgs)
+            uriCodeEvents -> db!!.delete(EVENT_TABLE_NAME, selection, selectionArgs)
             else -> throw IllegalArgumentException("Unknown URI: $uri")
         }
         context!!.contentResolver.notifyChange(uri, null)
@@ -157,6 +183,8 @@ class PetAppContentProvider : ContentProvider() {
             uriCodePetId -> "vnd.android.cursor.item/$PROVIDER_NAME.pets"
             uriCodeUsers -> "vnd.android.cursor.dir/$PROVIDER_NAME.users"
             uriCodeUserId -> "vnd.android.cursor.item/$PROVIDER_NAME.users"
+            uriCodeEvents -> "vnd.android.cursor.dir/$PROVIDER_NAME.events"
+            uriCodeEventId -> "vnd.android.cursor.item/$PROVIDER_NAME.events"
             else -> throw IllegalArgumentException("Unknown URI: $uri")
         }
     }
@@ -168,11 +196,13 @@ class PetAppContentProvider : ContentProvider() {
         override fun onCreate(db: SQLiteDatabase) {
             db.execSQL(CREATE_USER_PROFILE_TABLE)
             db.execSQL(CREATE_PET_TABLE)
+            db.execSQL(CREATE_EVENTS_TABLE)
         }
 
         override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
             db.execSQL("DROP TABLE IF EXISTS $USER_TABLE_NAME")
             db.execSQL("DROP TABLE IF EXISTS $PET_TABLE_NAME")
+            db.execSQL("DROP TABLE IF EXISTS $EVENT_TABLE_NAME")
             onCreate(db)
         }
     }

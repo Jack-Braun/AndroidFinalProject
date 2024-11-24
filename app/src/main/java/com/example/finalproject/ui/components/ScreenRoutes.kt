@@ -14,7 +14,8 @@ enum class PetScreens(@StringRes val title: Int) {
     Login(R.string.login_title),
     NewPet(R.string.new_pet_title),
     EditProfile(R.string.edit_profile_screen),
-    EditPet(R.string.edit_pet_screen)
+    EditPet(R.string.edit_pet_screen),
+    NewEvent(R.string.new_event_title)
 }
 
 

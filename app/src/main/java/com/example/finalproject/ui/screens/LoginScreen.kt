@@ -67,7 +67,6 @@ fun LoginScreen(
 
         Button(
             onClick = {
-
                 if (validateLogin(context, username, password)) {
                     incorrectLogin = false
                     login(username, password)

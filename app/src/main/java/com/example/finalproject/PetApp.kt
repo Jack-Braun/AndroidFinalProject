@@ -1,9 +1,11 @@
 package com.example.finalproject
 
+import android.annotation.SuppressLint
 import android.content.ContentValues
 import android.content.Context
 import android.database.SQLException
 import android.net.Uri
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -88,6 +90,8 @@ fun PetAppContent(
         backStackEntry?.destination?.route ?: PetScreens.Home.name
     )
 
+    val events = fetchEvents(LocalContext.current)
+
     Scaffold(
         topBar = {
             PetAppBar(
@@ -138,13 +142,20 @@ fun PetAppContent(
                 )
             }
             composable(route = PetScreens.Home.name) {
-                val profiles = fetchProfiles(LocalContext.current)
+                val context = LocalContext.current
+                val profiles = fetchProfiles(context)
                 HomeScreen(
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(16.dp),
                     onNavigate = { route -> navController.navigate(route) },
-                    profiles = profiles.filter { it.username != currentUserProfile?.username }
+                    profiles = profiles.filter { it.username != currentUserProfile?.username },
+                    newEvent = { navController.navigate(PetScreens.NewEvent.name) },
+                    events = events,
+                    currentUserProfile = currentUserProfile,
+                    addUserToEventAction = { eventId, username ->
+                        addUserToEvent(context, eventId, username)
+                    }
                 )
             }
             composable(route = PetScreens.Pet.name) {
@@ -173,7 +184,7 @@ fun PetAppContent(
                     onEditProfile = { navController.navigate(PetScreens.EditProfile.name) }
                 )
             }
-            composable(route = PetScreens.Map.name) { backStackEntry ->
+            composable(route = PetScreens.Map.name) {
                 MapScreen()
             }
             composable(route = PetScreens.Health.name) {
@@ -225,8 +236,70 @@ fun PetAppContent(
                     )
                 }
             }
+            composable(route = PetScreens.NewEvent.name) {
+                EventScreen(
+                    onNavigateBack = { navController.popBackStack() },
+                    addEvent = { event -> addEventToDatabase(navController.context, event) }
+                )
+            }
         }
     }
+}
+
+fun addUserToEvent(context: Context, eventId: Int, username: String) {
+    val uri = Uri.parse("content://com.example.finalproject/events/")
+    val selection = "id = ?"
+    val selectionArgs = arrayOf(eventId.toString())
+
+    val cursor = context.contentResolver.query(
+        uri,
+        arrayOf("id", "name", "address", "date", "attendees"),
+        selection,
+        selectionArgs,
+        null
+    )
+
+    cursor?.use {
+        if (it.moveToFirst()) {
+            val attendeesString = it.getString(it.getColumnIndexOrThrow("attendees"))
+            val attendees = attendeesString?.split(",")?.toMutableList() ?: mutableListOf()
+
+            if (!attendees.contains(username)) {
+                attendees.add(username)
+
+                val updatedAttendees = attendees.joinToString(",")
+
+                val values = ContentValues().apply {
+                    put("attendees", updatedAttendees)
+                }
+                context.contentResolver.update(
+                    uri,
+                    values,
+                    selection,
+                    selectionArgs
+                )
+            }
+        }
+    }
+}
+
+fun fetchEvents(context: Context): List<Event> {
+    val events = mutableListOf<Event>()
+    val uri = Uri.parse("content://com.example.finalproject/events")
+    val cursor = context.contentResolver.query(uri, null, null, null, null)
+
+    cursor?.use {
+        while (it.moveToNext()) {
+            val id = it.getInt(it.getColumnIndexOrThrow("id"))
+            val name = it.getString(it.getColumnIndexOrThrow("name"))
+            val address = it.getString(it.getColumnIndexOrThrow("address"))
+            val date = it.getString(it.getColumnIndexOrThrow("date"))
+            val attendees = it.getString(it.getColumnIndexOrThrow("attendees"))
+                ?.split(",")?.filter { attendee -> attendee.isNotBlank() } ?: emptyList()
+            events.add(Event(id, name, address, date, attendees.toMutableList()))
+        }
+    }
+    return events
 }
 
 fun updateUserProfileInDB(context: Context, username: String, name: String, bio: String) {
@@ -267,6 +340,20 @@ fun getUserPets(context: Context, username: String): List<Pet> {
         }
     }
     return pets
+}
+
+fun addEventToDatabase(context: Context, event: Event) {
+    val contentValues = ContentValues().apply {
+        put("name", event.name)
+        put("address", event.address)
+        put("date", event.date)
+        put("attendees", event.attendees.joinToString(","))
+    }
+
+    context.contentResolver.insert(
+        Uri.parse("content://com.example.finalproject/events"),
+        contentValues
+    )
 }
 
 //Creating new user and sending to the database

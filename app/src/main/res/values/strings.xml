@@ -11,4 +11,5 @@
     <string name="edit_profile_screen">Edit Profile</string>
     <string name="edit_pet_screen">Edit Pet</string>
     <string name="title_activity_map_screen">Map</string>
+    <string name="new_event_title">New Event</string>
 </resources>
