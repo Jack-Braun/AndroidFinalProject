@@ -239,7 +239,16 @@ fun PetAppContent(
             composable(route = PetScreens.NewEvent.name) {
                 EventScreen(
                     onNavigateBack = { navController.popBackStack() },
-                    addEvent = { event -> addEventToDatabase(navController.context, event) }
+                    addEvent = { event -> addEventToDatabase(navController.context, event) },
+                    fetchParks = {
+                        try {
+                            RetrofitInstance.api.getParks().results
+                        } catch (e: Exception) {
+                            //returns empty list if error
+                            emptyList()
+                        }
+                    }
+
                 )
             }
         }
