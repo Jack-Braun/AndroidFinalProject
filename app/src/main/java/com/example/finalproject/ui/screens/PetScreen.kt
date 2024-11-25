@@ -16,6 +16,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.sharp.AccountCircle
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -27,6 +28,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.example.finalproject.data.Pet
 
@@ -36,6 +38,7 @@ fun PetScreen(
     pets: List<Pet>,
     onNavigateToNewPet: () -> Unit,
     onEdit: (Pet) -> Unit,
+    onDeletePet: (Pet) -> Unit
 ) {
 
     Box(modifier = modifier.fillMaxSize()) {
@@ -47,7 +50,8 @@ fun PetScreen(
             items(pets) { pet ->
                 PetItem(
                     pet = pet,
-                    onEdit = {onEdit(pet)}
+                    onEdit = {onEdit(pet)},
+                    onDeletePet = {onDeletePet(pet)}
                 )
                 Spacer(modifier = Modifier.height(8.dp))
             }
@@ -74,6 +78,7 @@ fun PetScreen(
 fun PetItem(
     pet: Pet,
     onEdit: (Pet) -> Unit,
+    onDeletePet: () -> Unit
 ) {
     var isExpanded by remember { mutableStateOf(false) }
     Card(
@@ -105,6 +110,13 @@ fun PetItem(
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Text("Edit Pet")
+                }
+                Button(
+                    onClick = onDeletePet,
+                    modifier = Modifier.padding(top = 8.dp),
+                    colors = ButtonDefaults.buttonColors(Color.Red)
+                ) {
+                    Text("Delete")
                 }
             }
         }

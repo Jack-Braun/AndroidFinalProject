@@ -1,11 +1,9 @@
 package com.example.finalproject
 
-import android.annotation.SuppressLint
 import android.content.ContentValues
 import android.content.Context
 import android.database.SQLException
 import android.net.Uri
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -26,18 +24,15 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-
 import com.example.finalproject.data.*
 import com.example.finalproject.ui.components.*
 import com.example.finalproject.ui.screens.*
-import com.google.android.gms.maps.model.LatLng
 
 //The bar shown at the top of all screens
 @OptIn(ExperimentalMaterial3Api::class)
@@ -160,6 +155,11 @@ fun PetAppContent(
                 )
             }
             composable(route = PetScreens.Pet.name) {
+                //function to remove pet from pets list and the database
+                val toDelete: (Pet) -> Unit = { pet ->
+                    pets = pets.filter { it.id != pet.id }
+                    deletePetFromDB(navController.context ,pet)
+                }
                 PetScreen(
                     modifier = Modifier
                         .fillMaxSize()
@@ -170,6 +170,7 @@ fun PetAppContent(
                         currentUserPet = pet
                         navController.navigate(PetScreens.EditPet.name)
                     },
+                    onDeletePet = toDelete
                 )
             }
             composable(route = PetScreens.Profile.name) {
@@ -281,6 +282,14 @@ fun PetAppContent(
             }
         }
     }
+}
+
+fun deletePetFromDB(context: Context, pet: Pet) {
+    val uri = Uri.parse("content://com.example.finalproject/pets")
+    val selection = "id = ?"
+    val selectionArgs = arrayOf(pet.id.toString())
+
+    context.contentResolver.delete(uri, selection, selectionArgs)
 }
 
 fun updatePetInDB(
