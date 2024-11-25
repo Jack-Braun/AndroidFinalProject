@@ -84,6 +84,7 @@ fun PetAppContent(
     var isLoggedIn by remember { mutableStateOf(false) }
     var currentUserProfile by remember { mutableStateOf<UserProfile?>(null) }
     var pets by remember { mutableStateOf<List<Pet>>(emptyList()) }
+    var currentUserPet by remember { mutableStateOf<Pet?>(null) }
 
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentScreen = PetScreens.valueOf(
@@ -164,7 +165,11 @@ fun PetAppContent(
                         .fillMaxSize()
                         .padding(16.dp),
                     pets = pets,
-                    onNavigateToNewPet = { navController.navigate(PetScreens.NewPet.name) }
+                    onNavigateToNewPet = { navController.navigate(PetScreens.NewPet.name) },
+                    onEdit = {pet ->
+                        currentUserPet = pet
+                        navController.navigate(PetScreens.EditPet.name)
+                    },
                 )
             }
             composable(route = PetScreens.Profile.name) {
@@ -251,8 +256,55 @@ fun PetAppContent(
 
                 )
             }
+            composable(route = PetScreens.EditPet.name) { backStackEntry ->
+                currentUserPet?.let { pet ->
+                    EditPetScreen(
+                        pet = pet,
+                        updatePet = { name, breed, colour, age, animal ->
+                            updatePetInDB(
+                                context = navController.context,
+                                petId = pet.id,
+                                name = name,
+                                age = age,
+                                animal = animal,
+                                colour = colour,
+                                breed = breed
+                            )
+                        },
+                        onNavigateBack = { navController.popBackStack() },
+                        updatePetList = { updatedPet ->
+                            //Replaces the pet in the list with the newly updated pet
+                            pets = pets.map { if (it.id == updatedPet.id) updatedPet else it }
+                        }
+                    )
+                }
+            }
         }
     }
+}
+
+fun updatePetInDB(
+    context: Context,
+    petId: Int,
+    name: String,
+    age: Int,
+    animal: String,
+    colour: String,
+    breed: String
+) {
+    val values = ContentValues().apply {
+        put("name", name)
+        put("age", age)
+        put("animal", animal)
+        put("colour", colour)
+        put("breed", breed)
+    }
+    context.contentResolver.update(
+        Uri.parse("content://com.example.finalproject/pets"),
+        values,
+        "id = ?",
+        arrayOf(petId.toString())
+    )
 }
 
 fun addUserToEvent(context: Context, eventId: Int, username: String) {

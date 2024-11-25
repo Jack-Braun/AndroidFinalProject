@@ -96,6 +96,7 @@ fun NewPetScreen(
                 if (name.isNotBlank() && age.isNotBlank() && animal.isNotBlank() && colour.isNotBlank() && breed.isNotBlank()) {
                     currentUserProfile?.let { userProfile ->
                         val newPet = Pet(
+                            id = 0,
                             name = name,
                             age = age.toIntOrNull() ?: 0,
                             animal = animal,

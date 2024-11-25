@@ -34,8 +34,10 @@ import com.example.finalproject.data.Pet
 fun PetScreen(
     modifier: Modifier = Modifier,
     pets: List<Pet>,
-    onNavigateToNewPet: () -> Unit
+    onNavigateToNewPet: () -> Unit,
+    onEdit: (Pet) -> Unit,
 ) {
+
     Box(modifier = modifier.fillMaxSize()) {
         LazyColumn(
             modifier = Modifier
@@ -45,21 +47,22 @@ fun PetScreen(
             items(pets) { pet ->
                 PetItem(
                     pet = pet,
-                    onEdit = {}
+                    onEdit = {onEdit(pet)}
                 )
                 Spacer(modifier = Modifier.height(8.dp))
             }
         }
+
         FloatingActionButton(
             onClick = onNavigateToNewPet,
             modifier = Modifier
                 .align(Alignment.TopEnd)
                 .padding(16.dp)
         ) {
-            Column (
+            Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
-            ){
+            ) {
                 Text("Add New Pet", Modifier.padding(8.dp))
                 Icon(Icons.Filled.Add, contentDescription = "Add Pet", Modifier.padding(8.dp))
             }
@@ -70,13 +73,13 @@ fun PetScreen(
 @Composable
 fun PetItem(
     pet: Pet,
-    onEdit:(String) -> Unit
+    onEdit: (Pet) -> Unit,
 ) {
     var isExpanded by remember { mutableStateOf(false) }
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { isExpanded = !isExpanded }
+            .clickable {isExpanded = !isExpanded}
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -96,8 +99,9 @@ fun PetItem(
                 Text("Breed: ${pet.breed}")
                 Spacer(modifier = Modifier.height(8.dp))
                 Button(
-                    //fix later
-                    onClick = {},
+                    onClick = {
+                        onEdit(pet)
+                    },
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Text("Edit Pet")

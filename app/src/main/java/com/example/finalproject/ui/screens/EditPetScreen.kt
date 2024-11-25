@@ -25,7 +25,8 @@ import com.example.finalproject.data.Pet
 fun EditPetScreen(
     pet: Pet,
     updatePet: (String, String, String, Int, String) -> Unit,
-    onNavigateBack: () -> Unit
+    onNavigateBack: () -> Unit,
+    updatePetList: (Pet) -> Unit
 ) {
     var name by remember { mutableStateOf(pet.name) }
     var breed by remember { mutableStateOf(pet.breed) }
@@ -90,6 +91,14 @@ fun EditPetScreen(
             onClick = {
                 if (name.isNotBlank() && breed.isNotBlank() && colour.isNotBlank() && age.toIntOrNull() != null && animal.isNotBlank()) {
                     updatePet(name, breed, colour, age.toInt(), animal)
+                    val updatedPet = pet.copy(
+                        name = name,
+                        breed = breed,
+                        colour = colour,
+                        age = age.toInt(),
+                        animal = animal
+                    )
+                    updatePetList(updatedPet)
                     onNavigateBack()
                 } else {
                     error = "Please Enter Values"
