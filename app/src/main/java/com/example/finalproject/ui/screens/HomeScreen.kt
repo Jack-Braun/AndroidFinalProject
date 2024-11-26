@@ -46,7 +46,8 @@ fun HomeScreen(
     events: List<Event>,
     newEvent: () -> Unit,
     currentUserProfile: UserProfile?,
-    addUserToEventAction: (eventId: Int, username: String) -> Unit
+    addUserToEventAction: (eventId: Int, username: String) -> Unit,
+    onNavigateToMap: (String) -> Unit
 ) {
     var updatedEvents by remember { mutableStateOf(events) }
     var droppedDown by remember { mutableStateOf(false) }
@@ -120,6 +121,9 @@ fun HomeScreen(
                             if (it.id == eventId) it.copy(attendees = (it.attendees + username).toMutableList())
                             else it
                         }
+                    },
+                    onNavigateToMap = {address ->
+                        onNavigateToMap(address)
                     }
                 )
                 Spacer(modifier = Modifier.height(8.dp))
@@ -148,7 +152,8 @@ fun HomeScreen(
 fun EventItem(
     event: Event,
     currentUserProfile: UserProfile?,
-    addUserToEvent: (eventId: Int, username: String) -> Unit
+    addUserToEvent: (eventId: Int, username: String) -> Unit,
+    onNavigateToMap: (String) -> Unit
 ) {
     val isUserAlreadyAttending = event.attendees.contains(currentUserProfile?.username)
     var updatedEvent by remember { mutableStateOf(event) }
@@ -160,6 +165,13 @@ fun EventItem(
     ) {
         Text(text = "Event Name: ${event.name}")
         Text(text = "Address: ${event.address}")
+        Button(
+            onClick = {
+                onNavigateToMap(event.address)
+            }
+        ) {
+            Text("View This Location")
+        }
         Text(text = "Date: ${event.date}")
         Spacer(modifier = Modifier.height(8.dp))
 

@@ -4,6 +4,7 @@ import android.content.ContentValues
 import android.content.Context
 import android.database.SQLException
 import android.net.Uri
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -80,6 +81,7 @@ fun PetAppContent(
     var currentUserProfile by remember { mutableStateOf<UserProfile?>(null) }
     var pets by remember { mutableStateOf<List<Pet>>(emptyList()) }
     var currentUserPet by remember { mutableStateOf<Pet?>(null) }
+    var eventAddress by remember { mutableStateOf<String>("")}
 
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentScreen = PetScreens.valueOf(
@@ -151,6 +153,10 @@ fun PetAppContent(
                     currentUserProfile = currentUserProfile,
                     addUserToEventAction = { eventId, username ->
                         addUserToEvent(context, eventId, username)
+                    },
+                    onNavigateToMap = {address ->
+                        eventAddress = address
+                        navController.navigate(PetScreens.Map.name)
                     }
                 )
             }
@@ -191,7 +197,7 @@ fun PetAppContent(
                 )
             }
             composable(route = PetScreens.Map.name) {
-                MapScreen()
+                MapScreen(eventAddress = eventAddress)
             }
             composable(route = PetScreens.Health.name) {
                 HealthScreen(

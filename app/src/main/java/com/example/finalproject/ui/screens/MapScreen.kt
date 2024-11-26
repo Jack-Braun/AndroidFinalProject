@@ -16,14 +16,27 @@ import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
 
 @Composable
-fun MapScreen(viewModel: MapViewModel = MapViewModel()) {
+fun MapScreen(eventAddress: String? = "", viewModel: MapViewModel = MapViewModel()) {
+    Log.d("MAP", "The address is: $eventAddress")
+
     val parks by viewModel.parks.collectAsState()
     val cameraPositionState = rememberCameraPositionState {
+        //Base zoom coords
         position = CameraPosition.fromLatLngZoom(LatLng(49.2036, -122.9126), 10f)
     }
 
     LaunchedEffect(Unit) {
         viewModel.fetchParks()
+    }
+
+    val eventCoords = parks.find{park ->
+        park.address.equals(eventAddress)
+    }
+
+    eventCoords?.geo_point_2d?.let { coords ->
+        cameraPositionState.position = CameraPosition.fromLatLngZoom(
+            LatLng(coords.lat, coords.lon), 18f
+        )
     }
 
     GoogleMap(
@@ -36,11 +49,19 @@ fun MapScreen(viewModel: MapViewModel = MapViewModel()) {
             val address = park.address
             Log.d("MAP", "Lat: $lat, Lon: $lon, Address: $address")
             if (lat != null && lon != null) {
-                Marker(
-                    state = MarkerState(position = LatLng(lat, lon)),
-                    title = "Dog Park",
-                    snippet = address ?: "Address Not Found"
-                )
+                if(eventAddress == address) {
+                    Marker(
+                        state = MarkerState(position = LatLng(lat, lon)),
+                        title = "Your Events Address",
+                        snippet = address
+                    )
+                } else {
+                    Marker(
+                        state = MarkerState(position = LatLng(lat, lon)),
+                        title = "Dog Park",
+                        snippet = address ?: "Address Not Found"
+                    )
+                }
             }
         }
     }
