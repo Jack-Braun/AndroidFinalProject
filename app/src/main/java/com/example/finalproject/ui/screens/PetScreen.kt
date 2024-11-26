@@ -113,7 +113,7 @@ fun PetItem(
                 }
                 Button(
                     onClick = onDeletePet,
-                    modifier = Modifier.padding(top = 8.dp),
+                    modifier = Modifier.padding(top = 8.dp).fillMaxWidth(),
                     colors = ButtonDefaults.buttonColors(Color.Red)
                 ) {
                     Text("Delete")

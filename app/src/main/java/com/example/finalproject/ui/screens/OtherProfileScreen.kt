@@ -23,13 +23,11 @@ import com.example.finalproject.getUserPets
 fun OtherProfileScreen(
     profiles: List<UserProfile>,
 ) {
-
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(16.dp)
+            .padding(8.dp)
     ) {
-        Text("Other Users")
         LazyColumn(
             modifier = Modifier
                 .fillMaxWidth()
@@ -55,14 +53,13 @@ fun ProfileItem(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(8.dp)
+//            .padding(8.dp)
     ) {
         Text(text = "Username: ${profile.username}")
         Text(text = "Name: ${profile.name}")
         Text(text = "Bio: ${profile.bio}")
 
         if (pets.isNotEmpty()) {
-            Spacer(modifier = Modifier.height(8.dp))
             Text("Pets:")
             pets.forEach { pet ->
                 Column(modifier = Modifier

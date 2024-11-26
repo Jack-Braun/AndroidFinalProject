@@ -4,6 +4,7 @@ import android.content.ContentValues
 import android.content.Context
 import android.database.SQLException
 import android.widget.Toast
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -11,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -22,7 +24,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import com.example.finalproject.R
 import com.example.finalproject.data.Pet
 import com.example.finalproject.data.PetAppContentProvider
 import com.example.finalproject.data.UserProfile
@@ -49,8 +53,15 @@ fun NewPetScreen(
             .fillMaxSize()
             .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+//        verticalArrangement = Arrangement.Center
     ) {
+        Image(
+            painter = painterResource(id = R.drawable.dog_logo),
+            contentDescription = "A Dog Logo",
+            modifier = Modifier
+                .size(192.dp)
+                .padding(8.dp)
+        )
         OutlinedTextField(
             value = name,
             onValueChange = { name = it },

@@ -81,11 +81,8 @@ class PetAppContentProvider : ContentProvider() {
         init {
             uriMatcher = UriMatcher(UriMatcher.NO_MATCH)
             uriMatcher!!.addURI(PROVIDER_NAME, "pets", uriCodePets)
-            uriMatcher!!.addURI(PROVIDER_NAME, "pets/#", uriCodePetId)
             uriMatcher!!.addURI(PROVIDER_NAME, "users", uriCodeUsers)
-            uriMatcher!!.addURI(PROVIDER_NAME, "users/*", uriCodeUserId)
             uriMatcher!!.addURI(PROVIDER_NAME, "events", uriCodeEvents)
-            uriMatcher!!.addURI(PROVIDER_NAME, "events/#", uriCodeEventId)
         }
     }
 

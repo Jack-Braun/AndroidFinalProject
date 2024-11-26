@@ -56,36 +56,30 @@ fun HomeScreen(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Spacer(modifier = Modifier.weight(1f))
-            Box(
-                modifier = Modifier.wrapContentSize(Alignment.TopStart)
+            Button(
+                onClick = { droppedDown = !droppedDown },
+                modifier = Modifier
             ) {
-                Button(
-                    onClick = {droppedDown = !droppedDown},
-                    modifier = Modifier
-                ) {
-                    Text("Navigation")
-                    Icon(Icons.Filled.ArrowDropDown, contentDescription = null)
-                }
-                DropdownMenu(
-                    expanded = droppedDown,
-                    onDismissRequest = {droppedDown = false},
-                    modifier = Modifier.align(Alignment.TopEnd)
-                ) {
-                    screens.forEach { screen ->
-                        DropdownMenuItem(
-                            onClick = {
-                                droppedDown = false
-                                onNavigate(screen.name)
-                            },
-                            text = {
-                                Text(
-                                    text = stringResource(screen.title),
-                                    modifier = Modifier.fillMaxWidth()
-                                )
-                            }
-                        )
-                    }
+                Text("Navigation")
+                Icon(Icons.Filled.ArrowDropDown, contentDescription = null)
+            }
+            DropdownMenu(
+                expanded = droppedDown,
+                onDismissRequest = { droppedDown = false },
+            ) {
+                screens.forEach { screen ->
+                    DropdownMenuItem(
+                        onClick = {
+                            droppedDown = false
+                            onNavigate(screen.name)
+                        },
+                        text = {
+                            Text(
+                                text = stringResource(screen.title),
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                        }
+                    )
                 }
             }
         }
@@ -98,14 +92,12 @@ fun HomeScreen(
                 .size(192.dp)
                 .padding(8.dp)
         )
-        Spacer(modifier = Modifier.height(8.dp))
         Button(
             onClick = newEvent,
-            modifier = Modifier.padding(16.dp)
+            modifier = Modifier.padding(8.dp)
         ) {
             Text("Create Event")
         }
-        Spacer(modifier = Modifier.height(8.dp))
 
         LazyColumn(
             modifier = Modifier
@@ -123,7 +115,7 @@ fun HomeScreen(
                             else it
                         }
                     },
-                    onNavigateToMap = {address ->
+                    onNavigateToMap = { address ->
                         onNavigateToMap(address)
                     }
                 )
@@ -179,7 +171,7 @@ fun EventItem(
                 .fillMaxWidth()
                 .padding(8.dp),
         ) {
-            if(isUserAlreadyAttending) {
+            if (isUserAlreadyAttending) {
                 Text(text = "Already Signed Up")
             } else {
                 Text(text = "Sign Up For This Event")

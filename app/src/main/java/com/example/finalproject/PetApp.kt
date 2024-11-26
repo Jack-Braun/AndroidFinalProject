@@ -179,9 +179,6 @@ fun PetAppContent(
             }
             composable(route = PetScreens.Profile.name) {
                 ProfileScreen(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(16.dp),
                     //has a default UserProfile in case something goes wrong
                     userProfile = currentUserProfile ?: UserProfile(
                         username = "",
