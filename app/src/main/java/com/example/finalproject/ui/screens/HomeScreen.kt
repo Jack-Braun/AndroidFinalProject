@@ -2,6 +2,7 @@ package com.example.finalproject.ui.screens
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -9,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
@@ -25,24 +27,19 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.finalproject.R
 import com.example.finalproject.data.Event
-import com.example.finalproject.data.Pet
 import com.example.finalproject.data.UserProfile
-import com.example.finalproject.getUserPets
 import com.example.finalproject.ui.components.screens
 
 @Composable
 fun HomeScreen(
     modifier: Modifier = Modifier,
     onNavigate: (String) -> Unit,
-    profiles: List<UserProfile>,
     events: List<Event>,
     newEvent: () -> Unit,
     currentUserProfile: UserProfile?,
@@ -60,32 +57,36 @@ fun HomeScreen(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Spacer(modifier = Modifier.weight(1f))
-            Button(
-                onClick = { droppedDown = !droppedDown },
-                modifier = Modifier
+            Box(
+                modifier = Modifier.wrapContentSize(Alignment.TopStart)
             ) {
-                Text("Navigation")
-                Icon(Icons.Filled.ArrowDropDown, contentDescription = null)
-            }
-        }
-
-        DropdownMenu(
-            expanded = droppedDown,
-            onDismissRequest = { droppedDown = false }
-        ) {
-            screens.forEach { screen ->
-                DropdownMenuItem(
-                    onClick = {
-                        droppedDown = false
-                        onNavigate(screen.name)
-                    },
-                    text = {
-                        Text(
-                            text = stringResource(screen.title),
-                            modifier = Modifier.fillMaxWidth()
+                Button(
+                    onClick = {droppedDown = !droppedDown},
+                    modifier = Modifier
+                ) {
+                    Text("Navigation")
+                    Icon(Icons.Filled.ArrowDropDown, contentDescription = null)
+                }
+                DropdownMenu(
+                    expanded = droppedDown,
+                    onDismissRequest = {droppedDown = false},
+                    modifier = Modifier.align(Alignment.TopEnd)
+                ) {
+                    screens.forEach { screen ->
+                        DropdownMenuItem(
+                            onClick = {
+                                droppedDown = false
+                                onNavigate(screen.name)
+                            },
+                            text = {
+                                Text(
+                                    text = stringResource(screen.title),
+                                    modifier = Modifier.fillMaxWidth()
+                                )
+                            }
                         )
                     }
-                )
+                }
             }
         }
 
@@ -126,22 +127,6 @@ fun HomeScreen(
                         onNavigateToMap(address)
                     }
                 )
-                Spacer(modifier = Modifier.height(8.dp))
-            }
-        }
-        Spacer(modifier = Modifier.height(8.dp))
-
-        Text("Other Users")
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            items(profiles) { profile ->
-                val pets = getUserPets(context = LocalContext.current, profile.username)
-
-                ProfileItem(profile, pets)
                 Spacer(modifier = Modifier.height(8.dp))
             }
         }
@@ -199,42 +184,6 @@ fun EventItem(
             } else {
                 Text(text = "Sign Up For This Event")
             }
-        }
-    }
-}
-
-@Composable
-fun ProfileItem(
-    profile: UserProfile,
-    pets: List<Pet>
-) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(8.dp)
-    ) {
-        Text(text = "Username: ${profile.username}")
-        Text(text = "Name: ${profile.name}")
-        Text(text = "Bio: ${profile.bio}")
-
-        if (pets.isNotEmpty()) {
-            Spacer(modifier = Modifier.height(8.dp))
-            Text("Pets:")
-            pets.forEach { pet ->
-                Column(modifier = Modifier
-                    .fillMaxWidth()
-                    .background(color = Color.LightGray)
-                    .padding(16.dp)
-                ) {
-                    Text("Name: ${pet.name}")
-                    Text("Animal: ${pet.animal}")
-                    Text("Age: ${pet.age}")
-                    Text("Colour: ${pet.colour}")
-                    Text("Breed: ${pet.breed}")
-                }
-            }
-        } else {
-            Text("This user does not have any pets", color = Color.Red)
         }
     }
 }

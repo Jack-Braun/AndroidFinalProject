@@ -141,13 +141,11 @@ fun PetAppContent(
             }
             composable(route = PetScreens.Home.name) {
                 val context = LocalContext.current
-                val profiles = fetchProfiles(context)
                 HomeScreen(
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(16.dp),
                     onNavigate = { route -> navController.navigate(route) },
-                    profiles = profiles.filter { it.username != currentUserProfile?.username },
                     newEvent = { navController.navigate(PetScreens.NewEvent.name) },
                     events = events,
                     currentUserProfile = currentUserProfile,
@@ -285,6 +283,13 @@ fun PetAppContent(
                         }
                     )
                 }
+            }
+            composable(route = PetScreens.OtherProfiles.name) {
+                val context = LocalContext.current
+                val profiles = fetchProfiles(context)
+                OtherProfileScreen(
+                    profiles = profiles.filter { it.username != currentUserProfile?.username }
+                )
             }
         }
     }

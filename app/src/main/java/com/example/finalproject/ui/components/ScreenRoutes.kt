@@ -15,7 +15,8 @@ enum class PetScreens(@StringRes val title: Int) {
     NewPet(R.string.new_pet_title),
     EditProfile(R.string.edit_profile_screen),
     EditPet(R.string.edit_pet_screen),
-    NewEvent(R.string.new_event_title)
+    NewEvent(R.string.new_event_title),
+    OtherProfiles(R.string.other_profiles_title)
 }
 
 
@@ -26,5 +27,6 @@ val screens = listOf(
     PetScreens.Profile,
     PetScreens.Pet,
 //    PetScreens.Health,
-    PetScreens.Map
+    PetScreens.Map,
+    PetScreens.OtherProfiles
 )
