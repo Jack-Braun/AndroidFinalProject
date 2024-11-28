@@ -21,6 +21,7 @@
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="${MAP_KEY}"/>
+        <!--should there be any errors you could add your own api key here to view the map-->
 
         <meta-data
             android:name="com.google.android.gms.version"
