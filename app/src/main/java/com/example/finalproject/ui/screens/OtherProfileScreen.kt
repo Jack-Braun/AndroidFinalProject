@@ -36,7 +36,6 @@ fun OtherProfileScreen(
         ) {
             items(profiles) { profile ->
                 val pets = getUserPets(context = LocalContext.current, profile.username)
-
                 ProfileItem(profile, pets)
                 Spacer(modifier = Modifier.height(8.dp))
             }
@@ -53,12 +52,10 @@ fun ProfileItem(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-//            .padding(8.dp)
     ) {
         Text(text = "Username: ${profile.username}")
         Text(text = "Name: ${profile.name}")
         Text(text = "Bio: ${profile.bio}")
-
         if (pets.isNotEmpty()) {
             Text("Pets:")
             pets.forEach { pet ->

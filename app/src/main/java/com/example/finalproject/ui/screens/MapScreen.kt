@@ -16,8 +16,10 @@ import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
 
 @Composable
-fun MapScreen(eventAddress: String? = "", viewModel: MapViewModel = MapViewModel()) {
-    Log.d("MAP", "The address is: $eventAddress")
+fun MapScreen(
+    eventAddress: String? = "",
+    viewModel: MapViewModel = MapViewModel()
+) {
 
     val parks by viewModel.parks.collectAsState()
     val cameraPositionState = rememberCameraPositionState {
@@ -32,7 +34,6 @@ fun MapScreen(eventAddress: String? = "", viewModel: MapViewModel = MapViewModel
     val eventCoords = parks.find{park ->
         park.address.equals(eventAddress)
     }
-
     eventCoords?.geo_point_2d?.let { coords ->
         cameraPositionState.position = CameraPosition.fromLatLngZoom(
             LatLng(coords.lat, coords.lon), 18f
@@ -47,7 +48,7 @@ fun MapScreen(eventAddress: String? = "", viewModel: MapViewModel = MapViewModel
             val lat = park.geo_point_2d?.lat
             val lon = park.geo_point_2d?.lon
             val address = park.address
-            Log.d("MAP", "Lat: $lat, Lon: $lon, Address: $address")
+//            Log.d("MAP", "Lat: $lat, Lon: $lon, Address: $address")
             if (lat != null && lon != null) {
                 if(eventAddress == address) {
                     Marker(

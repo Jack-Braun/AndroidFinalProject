@@ -89,7 +89,8 @@ fun EditPetScreen(
         }
         Button(
             onClick = {
-                if (name.isNotBlank() && breed.isNotBlank() && colour.isNotBlank() && age.toIntOrNull() != null && animal.isNotBlank()) {
+                if (name.isNotBlank() && breed.isNotBlank() && colour.isNotBlank()
+                    && age.toIntOrNull() != null && animal.isNotBlank()) {
                     updatePet(name, breed, colour, age.toInt(), animal)
                     val updatedPet = pet.copy(
                         name = name,

@@ -4,7 +4,6 @@ import android.content.ContentValues
 import android.content.Context
 import android.database.SQLException
 import android.net.Uri
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -67,7 +66,6 @@ fun PetAppBar(
 fun PetApp(
     navController: NavHostController = rememberNavController()
 ) {
-
     PetAppContent(
         navController = navController,
     )
@@ -79,7 +77,7 @@ fun PetAppContent(
 ) {
     var isLoggedIn by remember { mutableStateOf(false) }
     var currentUserProfile by remember { mutableStateOf<UserProfile?>(null) }
-    var pets by remember { mutableStateOf<List<Pet>>(emptyList()) }
+    var currentUserPetList by remember { mutableStateOf<List<Pet>>(emptyList()) }
     var currentUserPet by remember { mutableStateOf<Pet?>(null) }
     var eventAddress by remember { mutableStateOf<String>("")}
 
@@ -87,7 +85,6 @@ fun PetAppContent(
     val currentScreen = PetScreens.valueOf(
         backStackEntry?.destination?.route ?: PetScreens.Home.name
     )
-
     val events = fetchEvents(LocalContext.current)
 
     Scaffold(
@@ -128,7 +125,7 @@ fun PetAppContent(
                                     ?: "Not Set",
                                 pets = getUserPets(context, username)
                             )
-                            pets = currentUserProfile?.pets ?: emptyList()
+                            currentUserPetList = currentUserProfile?.pets ?: emptyList()
                             isLoggedIn = true
                             userCursor.close()
                             navController.navigate(PetScreens.Home.name)
@@ -149,7 +146,7 @@ fun PetAppContent(
                     newEvent = { navController.navigate(PetScreens.NewEvent.name) },
                     events = events,
                     currentUserProfile = currentUserProfile,
-                    addUserToEventAction = { eventId, username ->
+                    addUserToEvent = { eventId, username ->
                         addUserToEvent(context, eventId, username)
                     },
                     onNavigateToMap = {address ->
@@ -161,14 +158,14 @@ fun PetAppContent(
             composable(route = PetScreens.Pet.name) {
                 //function to remove pet from pets list and the database
                 val toDelete: (Pet) -> Unit = { pet ->
-                    pets = pets.filter { it.id != pet.id }
+                    currentUserPetList = currentUserPetList.filter { it.id != pet.id }
                     deletePetFromDB(navController.context ,pet)
                 }
                 PetScreen(
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(16.dp),
-                    pets = pets,
+                    pets = currentUserPetList,
                     onNavigateToNewPet = { navController.navigate(PetScreens.NewPet.name) },
                     onEdit = {pet ->
                         currentUserPet = pet
@@ -222,7 +219,7 @@ fun PetAppContent(
                     currentUserProfile = currentUserProfile,
                     //This function is needed or the PetScreen will not show the current pet list after adding a new pet
                     updatePetList = { newPet ->
-                        pets = pets + newPet
+                        currentUserPetList = currentUserPetList + newPet
                     }
                 )
             }
@@ -258,7 +255,7 @@ fun PetAppContent(
 
                 )
             }
-            composable(route = PetScreens.EditPet.name) { backStackEntry ->
+            composable(route = PetScreens.EditPet.name) {
                 currentUserPet?.let { pet ->
                     EditPetScreen(
                         pet = pet,
@@ -276,7 +273,7 @@ fun PetAppContent(
                         onNavigateBack = { navController.popBackStack() },
                         updatePetList = { updatedPet ->
                             //Replaces the pet in the list with the newly updated pet
-                            pets = pets.map { if (it.id == updatedPet.id) updatedPet else it }
+                            currentUserPetList = currentUserPetList.map { if (it.id == updatedPet.id) updatedPet else it }
                         }
                     )
                 }
@@ -336,7 +333,6 @@ fun addUserToEvent(context: Context, eventId: Int, username: String) {
         selectionArgs,
         null
     )
-
     cursor?.use {
         if (it.moveToFirst()) {
             val attendeesString = it.getString(it.getColumnIndexOrThrow("attendees"))
@@ -442,10 +438,8 @@ fun registerNewUser(context: Context, username: String, password: String, name: 
         put("name", name)
         put("bio", bio)
     }
-
     try {
         val uri = context.contentResolver.insert(Uri.parse("content://com.example.finalproject/users"), values)
-
         if (uri != null) {
             Toast.makeText(context, "Profile created", Toast.LENGTH_SHORT).show()
         } else {

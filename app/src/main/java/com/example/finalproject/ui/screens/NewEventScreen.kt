@@ -37,7 +37,7 @@ fun EventScreen(
 
     LaunchedEffect(Unit) {
         parks = fetchParks()
-        Log.d("API", "parks loaded as: $parks")
+//        Log.d("MAP", "parks loaded as: $parks")
     }
 
     Column(

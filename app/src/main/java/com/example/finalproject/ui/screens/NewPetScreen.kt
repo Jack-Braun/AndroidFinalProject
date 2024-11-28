@@ -104,7 +104,8 @@ fun NewPetScreen(
 
         Button(
             onClick = {
-                if (name.isNotBlank() && age.isNotBlank() && animal.isNotBlank() && colour.isNotBlank() && breed.isNotBlank()) {
+                if (name.isNotBlank() && age.isNotBlank() && animal.isNotBlank()
+                    && colour.isNotBlank() && breed.isNotBlank()) {
                     currentUserProfile?.let { userProfile ->
                         val newPet = Pet(
                             id = 0,
@@ -137,16 +138,5 @@ fun addPet(pet: Pet, context: Context) {
         put("breed", pet.breed)
         put("owner", pet.owner)
     }
-
-    try {
-        val uri = context.contentResolver.insert(PetAppContentProvider.PET_CONTENT_URI, values)
-
-        if (uri != null) {
-            Toast.makeText(context, "Pet added successfully!", Toast.LENGTH_SHORT).show()
-        } else {
-            Toast.makeText(context, "Failed to add pet.", Toast.LENGTH_SHORT).show()
-        }
-    } catch (e: SQLException) {
-        Toast.makeText(context, "Error while adding pet.", Toast.LENGTH_LONG).show()
-    }
+    context.contentResolver.insert(PetAppContentProvider.PET_CONTENT_URI, values)
 }

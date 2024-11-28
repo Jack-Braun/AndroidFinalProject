@@ -40,7 +40,6 @@ fun PetScreen(
     onEdit: (Pet) -> Unit,
     onDeletePet: (Pet) -> Unit
 ) {
-
     Box(modifier = modifier.fillMaxSize()) {
         LazyColumn(
             modifier = Modifier
@@ -56,7 +55,6 @@ fun PetScreen(
                 Spacer(modifier = Modifier.height(8.dp))
             }
         }
-
         FloatingActionButton(
             onClick = onNavigateToNewPet,
             modifier = Modifier

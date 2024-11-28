@@ -43,7 +43,6 @@ class PetAppContentProvider : ContentProvider() {
         const val PET_TABLE_NAME = "Pets"
         const val EVENT_TABLE_NAME = "Events"
 
-        // Create user profile table
         const val CREATE_USER_PROFILE_TABLE = """
             CREATE TABLE $USER_TABLE_NAME (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -53,8 +52,6 @@ class PetAppContentProvider : ContentProvider() {
                 bio TEXT
             );
         """
-
-        // Create pet table
         const val CREATE_PET_TABLE = """
             CREATE TABLE $PET_TABLE_NAME (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -67,17 +64,15 @@ class PetAppContentProvider : ContentProvider() {
                 FOREIGN KEY (owner) REFERENCES $USER_TABLE_NAME(username)
             );
         """
-
         const val CREATE_EVENTS_TABLE = """
-    CREATE TABLE $EVENT_TABLE_NAME (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name TEXT NOT NULL,
-        address TEXT NOT NULL,
-        date TEXT NOT NULL,
-        attendees TEXT
-    );
-"""
-
+            CREATE TABLE $EVENT_TABLE_NAME (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name TEXT NOT NULL,
+                address TEXT NOT NULL,
+                date TEXT NOT NULL,
+                attendees TEXT
+            );
+        """
         init {
             uriMatcher = UriMatcher(UriMatcher.NO_MATCH)
             uriMatcher!!.addURI(PROVIDER_NAME, "pets", uriCodePets)

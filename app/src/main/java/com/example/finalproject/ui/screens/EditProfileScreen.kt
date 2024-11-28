@@ -52,7 +52,7 @@ fun EditProfileScreen(
         OutlinedTextField(
             value = name,
             onValueChange = { name = it },
-            label = { Text("Full Name") },
+            label = { Text("Name") },
             modifier = Modifier.fillMaxWidth()
         )
         OutlinedTextField(

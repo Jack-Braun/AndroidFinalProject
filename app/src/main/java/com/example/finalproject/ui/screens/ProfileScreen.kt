@@ -31,7 +31,7 @@ fun ProfileScreen(
             contentDescription = "Profile Picture"
         )
         Text("Username: ${userProfile.username}", modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center)
-        Text("Full Name: ${userProfile.name}", modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center)
+        Text("Name: ${userProfile.name}", modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center)
         Text("Bio: ${userProfile.bio}", modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center)
 
         Button(onClick = onEditProfile, modifier = Modifier.fillMaxWidth()) {

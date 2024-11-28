@@ -16,6 +16,7 @@ class MapViewModel : ViewModel() {
     fun fetchParks() = viewModelScope.launch {
         try {
             val response = RetrofitInstance.api.getParks()
+            Log.d("MAP", "Response is: $response")
             _parks.value = response.results.mapNotNull { record ->
                 val coords = record.geo_point_2d?.let {
                     Coords(
@@ -30,7 +31,6 @@ class MapViewModel : ViewModel() {
                     )
                 }
             }
-            Log.d("MAP", "Response: ${response.results}")
         } catch (e: Exception) {
             e.printStackTrace()
         }

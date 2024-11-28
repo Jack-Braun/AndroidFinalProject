@@ -22,11 +22,8 @@ enum class PetScreens(@StringRes val title: Int) {
 
 //A list of the screens for looping purposes
 val screens = listOf(
-    //Non functional screens currently commented out
-//    PetScreens.Home,
     PetScreens.Profile,
+    PetScreens.OtherProfiles,
     PetScreens.Pet,
-//    PetScreens.Health,
-    PetScreens.Map,
-    PetScreens.OtherProfiles
+    PetScreens.Map
 )

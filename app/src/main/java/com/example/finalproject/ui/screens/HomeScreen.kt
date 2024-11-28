@@ -1,8 +1,6 @@
 package com.example.finalproject.ui.screens
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -10,7 +8,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
@@ -43,7 +40,7 @@ fun HomeScreen(
     events: List<Event>,
     newEvent: () -> Unit,
     currentUserProfile: UserProfile?,
-    addUserToEventAction: (eventId: Int, username: String) -> Unit,
+    addUserToEvent: (eventId: Int, username: String) -> Unit,
     onNavigateToMap: (String) -> Unit
 ) {
     var updatedEvents by remember { mutableStateOf(events) }
@@ -84,12 +81,12 @@ fun HomeScreen(
             }
         }
 
-        Text(text = "Pet App", fontSize = 24.sp)
+        Text(text = "BarkBook", fontSize = 24.sp)
         Image(
             painter = painterResource(id = R.drawable.dog_logo),
             contentDescription = "A Dog Logo",
             modifier = Modifier
-                .size(192.dp)
+                .size(160.dp)
                 .padding(8.dp)
         )
         Button(
@@ -109,7 +106,7 @@ fun HomeScreen(
                     event = event,
                     currentUserProfile = currentUserProfile,
                     addUserToEvent = { eventId, username ->
-                        addUserToEventAction(eventId, username)
+                        addUserToEvent(eventId, username)
                         updatedEvents = updatedEvents.map {
                             if (it.id == eventId) it.copy(attendees = (it.attendees + username).toMutableList())
                             else it
